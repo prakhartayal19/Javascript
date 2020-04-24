@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+    <div class="box" id="heading">
+
+        <h1><%=kindOfDay%> </h1>
+    </div>
+
+    <div class="box">
+
+        <% newListItems.forEach(function(item){ %>
+            <form action="/delete" method="POST">
+                <div class="item">
+
+                    <input type="checkbox" name="chk" value=<%=item._id %> onclick="this.form.submit()"">
+                    <p><%=item.name   %></p>
+                </div>
+
+            </form>
+        
+        
+        <% }) %>
+
+       
+
+
+
+
+        <form class="item" action="/" method="POST">
+            <input type="text" name="newItem" placeholder="New Items" autocomplete="off">
+            <!-- AUTOCOMPLETE will off suggestions -->
+            <button type="submit" name="list" value="<%= kindOfDay%>">+</button>
+        </form>
+    </div>
+
+    <h2 class="by">-Prakhar Tayal</h2>
+
+</body>
+
+</html>

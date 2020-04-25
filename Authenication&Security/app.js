@@ -1,8 +1,12 @@
 //jshint esversion:6
+require('dotenv').config()
 const express=require("express");             // Import express module and others
 const bodyParser=require("body-parser");
 const ejs=require("ejs");
 const mongoose=require("mongoose");
+const encrypt=require("mongoose-encryption");
+const md5=require("md5");
+
 
 const app=express();                                   // Make an object of express
 app.set("view engine","ejs")                          // set view engine as ejs
@@ -11,10 +15,17 @@ app.use(express.static("public"));                  // To use public css or othe
 
 mongoose.connect("mongodb://localhost:27017/userDB",{useNewUrlParser:true,useUnifiedTopology: true})
 
-const userSchema={                                          //Creating user scheme with email and password
+const userSchema=new mongoose.Schema({                          // Creating schema using mongoose                         //Creating user scheme with email and password
     email:String,
     password:String
-};
+});
+
+// userSchema.plugin(encrypt,{
+//     secret:process.env.SECRET,
+//     encryptedFields:["password"],
+    
+//     additionalAuthenticatedFields: ['email']
+// });         //Encrypting a password & using dotenv files to store secret key "refer documentation"
 
 const User=new mongoose.model("user",userSchema);           // Creating database model
 
@@ -43,7 +54,7 @@ app.get("/logout",(req,res)=>{
 app.post("/register",function(req,res){
     const user=new User({
         email:req.body.username,
-        password:req.body.password
+        password:md5(req.body.password)
     })
     user.save();                                                      //Save user data in database
     res.render("secrets")                                             //After register it renders secretrs page
@@ -51,11 +62,13 @@ app.post("/register",function(req,res){
 
 app.post("/login",(req,res)=>{
     const username=req.body.username;
-    const password=req.body.password;
+    const password=md5(req.body.password);                          // Use of md5 to convert convert into a hash value
 
     User.findOne({email:username},function(err,foundUser){          //Finds whether an email exists in database or not
         if(err){
             console.log("Error occured!!!");
+            console.log(err);
+            
             
         }
         else{
